@@ -30,11 +30,7 @@ void MainMenu::print_field()
 }
 void MainMenu::increase_field()
 {
-	for_each(tab_field.begin(), tab_field.end(),
-		[&](pair<char,cvec> val)
-		{
-			val.second.push_back('-');
-		});
+	for (auto& field : tab_field) field.second.push_back('-');
 }
 
 void MainMenu::run()
@@ -48,7 +44,13 @@ void MainMenu::run()
 		}
 		if (_kbhit())
 		{
-
+			int input = _getch();
+			switch ((CODES)input)
+			{
+			case CODES::i: increase_field(); break;
+			};
+			any_action = true;
+			system("cls");
 		}
 	}
 }

@@ -1,7 +1,6 @@
 #pragma once
 #include<vector>
 #include<map>
-#include<algorithm>
 #include<iostream>
 #include<conio.h>
 #include<stdio.h>
@@ -18,6 +17,11 @@ private:
 	const size_t string_number = 6;
 
 	bool any_action = true;
+
+	enum class CODES
+	{
+		i = 105,
+	};
 public:
 	MainMenu();
 	~MainMenu();
@@ -25,7 +29,7 @@ private:
 	void init_field();
 
 	void print_field();
-	void increase_field();
+	inline void increase_field();
 	void run();
 };
 };
