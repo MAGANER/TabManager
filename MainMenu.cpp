@@ -173,7 +173,7 @@ vector<string> MainMenu::read_tab_file(const string& file)
 	if (!tab_file)
 	{
 		cout << "can not read " << file << "!" << endl;
-		Sleep(6000);
+		Sleep(60);
 		return vector<string>();
 	}
 	vector<string> values;
@@ -278,7 +278,7 @@ void MainMenu::dump(const string& path)
 		pos.x = 0;
 		
 	}
-
+	
 	int counter = 0;
 	while (window.isOpen())
 	{
@@ -296,6 +296,8 @@ void MainMenu::dump(const string& path)
 		screenshot.saveToFile(path);//)//window.close();
 		if (counter > 5)window.close();
 		window.clear();
+
+		//int mult = tab_vec[0].size() / 22;
 		for (auto tabs : tab_vec)
 		{
 			for (auto t : tabs)
