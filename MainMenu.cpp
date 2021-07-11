@@ -65,6 +65,7 @@ void MainMenu::run()
 			case CODES::a: add_new_value();  break;
 			case CODES::s: save();           break;
 			case CODES::r: load();           break;
+			case CODES::d: dump_to_png();    break;
 
 			case CODES::h: move(LEFT);  break;
 			case CODES::l: move(RIGHT); break;
@@ -213,4 +214,97 @@ vector<string> MainMenu::split_tab_line(const string& tab)
 			cells.push_back(val);
 	}
 	return cells;
+}
+
+void MainMenu::dump_to_png()
+{
+	cout << "it will save tab as .png anyway!" << endl;
+	cout << "enter path:";
+
+	string path;
+	cin >> path;
+	dump(path);
+}
+void MainMenu::dump(const string& path)
+{
+	sf::RenderWindow window(sf::VideoMode(720, 320), "test");
+	sf::Font font;
+	font.loadFromFile("arial.ttf");
+	vector<vector<sf::Text*>> tab_vec;
+	sf::Vector2f pos(0.0f, 0.0f);
+
+	int size = 30;
+	for (size_t i = 0; i < string_number; i++)
+	{
+		auto name = string_names[i];
+		auto tabs = tab_field[name];
+		string line; 
+		line += name; 
+		line += '|';
+
+		vector<sf::Text*> tab_line;
+		
+		if (i == 0)size = 35;
+		else if (i > 1 && i <= 2)size -= 2;
+		else size = 30;
+		sf::Text* text = new sf::Text(line, font, size);
+		text->setPosition(pos);
+		tab_line.push_back(text);
+
+		bool move_y_back = false;
+		for (auto s : tabs)
+		{
+			sf::Text* val = nullptr;
+			pos.x += 30;
+			if (s == "-")
+				val = new sf::Text("-", font, 30);
+			else
+			{
+				val = new sf::Text(s, font, 25);
+				pos.y += 5.0f;
+				move_y_back = true;
+			}
+			val->setPosition(pos);
+			if (move_y_back)
+			{
+				pos.y -= 5.0f;
+				move_y_back = false;
+			}
+			tab_line.push_back(val);
+		}
+		tab_vec.push_back(tab_line);
+
+		pos.y += 30;
+		pos.x = 0;
+		
+	}
+
+	int counter = 0;
+	while (window.isOpen())
+	{
+		sf::Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+				window.close();
+		}
+	
+		sf::Texture texture;
+		texture.create(window.getSize().x, window.getSize().y);
+		texture.update(window);
+		sf::Image screenshot = texture.copyToImage();
+		screenshot.saveToFile(path);//)//window.close();
+		if (counter > 5)window.close();
+		window.clear();
+		for (auto tabs : tab_vec)
+		{
+			for (auto t : tabs)
+			{
+				window.draw(*t);
+			}
+		}
+		window.display();
+		++counter;
+	}
+
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include<Windows.h>
+#include"SFML/Graphics.hpp"
 #include<vector>
 #include<map>
 #include<iostream>
@@ -8,11 +8,11 @@
 #include<string>
 #include<conio.h>
 #include<stdio.h>
+#include<Windows.h>
 
 namespace TabManager
 {
 using namespace std;
-
 
 struct Coord
 {
@@ -35,6 +35,7 @@ private:
 		a = 97,  //add new value
 		s = 115, //save
 		r = 114, //read
+		d = 100, //dump to png
 
 		j = 106, //down
 		k = 107, //up
@@ -86,6 +87,9 @@ private:
 	vector<string> read_tab_file(const string& path);
 	void make_tab_field(const vector<string>& lines);
 	vector<string> split_tab_line(const string& tab);
+
+	void dump_to_png();
+	void dump(const string& path);
 };
 };
 
