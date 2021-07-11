@@ -4,6 +4,7 @@
 #include<map>
 #include<iostream>
 #include<fstream>
+#include<sstream>
 #include<string>
 #include<conio.h>
 #include<stdio.h>
@@ -33,6 +34,7 @@ private:
 		i = 105, //increase field
 		a = 97,  //add new value
 		s = 115, //save
+		r = 114, //read
 
 		j = 106, //down
 		k = 107, //up
@@ -79,6 +81,11 @@ private:
 
 	void save();
 	void write_tab_down(const string& path);
+
+	void load();
+	vector<string> read_tab_file(const string& path);
+	void make_tab_field(const vector<string>& lines);
+	vector<string> split_tab_line(const string& tab);
 };
 };
 

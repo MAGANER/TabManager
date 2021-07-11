@@ -64,6 +64,7 @@ void MainMenu::run()
 			case CODES::i: increase_field(); break;
 			case CODES::a: add_new_value();  break;
 			case CODES::s: save();           break;
+			case CODES::r: load();           break;
 
 			case CODES::h: move(LEFT);  break;
 			case CODES::l: move(RIGHT); break;
@@ -140,7 +141,7 @@ void MainMenu::write_tab_down(const string& path)
 		auto name = string_names[i];
 		val += name;
 		val += "|";
-		for (auto v : tab_field[name]) val += v;
+		for (auto v : tab_field[name]) val += " "+v+" ";
 		values.push_back(val);
 	}
 	for (auto v : values)
@@ -156,4 +157,60 @@ void MainMenu::save()
 	cout << "path:";
 	cin >> path;
 	write_tab_down(path);
+}
+
+void MainMenu::load()
+{
+	cout << "enter tab file path:";
+	string path;
+	cin >> path;
+	make_tab_field(read_tab_file(path));
+}
+vector<string> MainMenu::read_tab_file(const string& file)
+{
+	ifstream tab_file(file);
+	if (!tab_file)
+	{
+		cout << "can not read " << file << "!" << endl;
+		Sleep(6000);
+		return vector<string>();
+	}
+	vector<string> values;
+	for (size_t i = 0; i < string_number; i++)
+	{
+		string val;
+		getline(tab_file, val);
+		values.push_back(val);
+	}
+	tab_file.close();
+
+	return values;
+}
+void MainMenu::make_tab_field(const vector<string>& lines)
+{
+	auto substr = [&](const string& str, int beg, int end)
+	{
+		string sub;
+		for (int i = beg; i < end; ++i)sub += str[i];
+		return sub;
+	};
+	for (auto& line : lines)
+	{
+		string tabs = substr(line, 3, line.size());
+		char string_name = line[0];
+		tab_field[string_name] = split_tab_line(tabs);
+	}
+}
+vector<string> MainMenu::split_tab_line(const string& tab)
+{
+	vector<string> cells;
+
+	istringstream iss(tab);
+	string val;
+	while (getline(iss, val, ' '))
+	{
+		if(!val.empty())
+			cells.push_back(val);
+	}
+	return cells;
 }
