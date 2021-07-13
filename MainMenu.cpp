@@ -19,6 +19,7 @@ void MainMenu::init_field()
 void MainMenu::print_field()
 {
 	//print in order of insertion
+	
 	for (size_t i = 0; i < string_number; i++)
 	{
 		auto curr = string_names[i];
@@ -29,14 +30,15 @@ void MainMenu::print_field()
 		cout << curr;
 		setcolor(COLORS::GREEN, COLORS::BLACK);
 		cout << "|";
-		for (size_t n= 0;n<tab.size();n++)
+		for (size_t n = 0; n < tab.size(); n++)
 		{
 			auto point = tab[n];
 			if (current_pos.x == n &&
-				current_pos.y == i) 
+				current_pos.y == i)
 				setcolor(COLORS::MAGENTA, COLORS::BLACK);
 			else setcolor(COLORS::GREEN, COLORS::BLACK);
-			cout << point << " ";
+			cout << point;
+			cout << " ";
 			setcolor(COLORS::GREEN, COLORS::BLACK);
 		}
 		cout << endl;
@@ -119,6 +121,28 @@ void MainMenu::add_new_value()
 	cout << "value:";
 	cin >> val;
 	insert_to_field(val);
+	align_field(val.size());
+}
+void MainMenu::align_field(size_t val_size)
+{
+	int string_to_be_unchanged = current_pos.y;
+	for (int i = 0; i < string_number; i++)
+	{
+		if (i != string_to_be_unchanged)
+		{
+			auto curr_str  = string_names[i];
+			auto cell_size = tab_field[curr_str][current_pos.x].size();
+
+			if (val_size != cell_size)
+			{
+				string alignment;
+				size_t alignment_size = val_size - cell_size;
+				for (int i = 0; i < alignment_size; i++)alignment += ' ';
+
+				tab_field[curr_str][current_pos.x] += alignment;
+			}
+		}
+	}
 }
 void MainMenu::insert_to_field(const string& val)
 {
@@ -136,6 +160,7 @@ void MainMenu::write_tab_down(const string& path)
 	ofstream file(path);
 
 	vector<string> values;
+
 	for (size_t i = 0; i < string_number; i++)
 	{
 		string val;
@@ -145,6 +170,7 @@ void MainMenu::write_tab_down(const string& path)
 		for (auto v : tab_field[name]) val += " "+v+" ";
 		values.push_back(val);
 	}
+
 	for (auto v : values)
 	{
 		file << v << endl;
@@ -166,6 +192,7 @@ void MainMenu::load()
 	string path;
 	cin >> path;
 	make_tab_field(read_tab_file(path));
+	align_loaded_field();
 }
 vector<string> MainMenu::read_tab_file(const string& file)
 {
@@ -214,6 +241,22 @@ vector<string> MainMenu::split_tab_line(const string& tab)
 			cells.push_back(val);
 	}
 	return cells;
+}
+void MainMenu::align_loaded_field()
+{
+	Coord max = get_max_pos();
+	for (int x = 0; x < max.x; x++)
+	{
+		for (int y = 0; y < max.y; y++)
+		{
+			current_pos.x = x;
+			current_pos.y = y;
+
+			auto string_name = string_names[y];
+			auto curr_size = tab_field[string_name][x].size();
+			align_field(curr_size);
+		}
+	}
 }
 
 void MainMenu::dump_to_png()
@@ -294,13 +337,13 @@ void MainMenu::dump(const string& path)
 		texture.update(window);
 		sf::Image screenshot = texture.copyToImage();
 		screenshot.saveToFile(path);//)//window.close();
-		if (counter > 5)window.close();
-		window.clear();
+		if (counter > 5) window.close();
 
-		//int mult = tab_vec[0].size() / 22;
+
+		window.clear();
 		for (auto tabs : tab_vec)
 		{
-			for (auto t : tabs)
+			for (auto t:tabs)
 			{
 				window.draw(*t);
 			}
@@ -308,5 +351,4 @@ void MainMenu::dump(const string& path)
 		window.display();
 		++counter;
 	}
-
 }

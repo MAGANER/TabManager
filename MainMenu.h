@@ -5,6 +5,7 @@
 #include<iostream>
 #include<fstream>
 #include<sstream>
+#include<algorithm>
 #include<string>
 #include<conio.h>
 #include<stdio.h>
@@ -78,6 +79,7 @@ private:
 	void setcolor(COLORS _textcol, COLORS backcol);
 
 	void add_new_value();
+	void align_field(size_t val_size);
 	void insert_to_field(const string& val);
 
 	void save();
@@ -87,6 +89,7 @@ private:
 	vector<string> read_tab_file(const string& path);
 	void make_tab_field(const vector<string>& lines);
 	vector<string> split_tab_line(const string& tab);
+	void align_loaded_field();
 
 	void dump_to_png();
 	void dump(const string& path);
