@@ -3,6 +3,7 @@ using namespace TabManager;
 
 MainMenu::MainMenu()
 {
+	font.loadFromFile("arial.ttf");
 	init_field();
 
 	run();
@@ -268,25 +269,24 @@ void MainMenu::dump_to_png()
 	cin >> path;
 	dump(path);
 }
-void MainMenu::dump(const string& path)
+
+vector<vector<sf::Text*>> MainMenu::convert_tabs_to_drawable_text()
 {
-	sf::RenderWindow window(sf::VideoMode(720, 320), "test");
-	sf::Font font;
-	font.loadFromFile("arial.ttf");
 	vector<vector<sf::Text*>> tab_vec;
 	sf::Vector2f pos(0.0f, 0.0f);
 
 	int size = 30;
+	cout << pos.x << "  " << pos.y << endl;
 	for (size_t i = 0; i < string_number; i++)
 	{
 		auto name = string_names[i];
 		auto tabs = tab_field[name];
-		string line; 
-		line += name; 
+		string line;
+		line += name;
 		line += '|';
 
 		vector<sf::Text*> tab_line;
-		
+
 		if (i == 0)size = 35;
 		else if (i > 1 && i <= 2)size -= 2;
 		else size = 30;
@@ -319,9 +319,71 @@ void MainMenu::dump(const string& path)
 
 		pos.y += 30;
 		pos.x = 0;
-		
+
 	}
+
+	return tab_vec;
+}
+void MainMenu::take_screenshot(sf::RenderWindow& window,
+							   const string& path)
+{
+	sf::Texture texture;
+	texture.create(window.getSize().x, window.getSize().y);
+	texture.update(window);
+	sf::Image screenshot = texture.copyToImage();
+	screenshot.saveToFile(path);
+}
+vector<vector<sf::Text*>> MainMenu::slice_tab(vector<vector<sf::Text*>>& tabs, 
+											  int begin, 
+											  int end)
+{
+	vector<vector<sf::Text*>> slice;
+	for (auto& line : tabs)
+	{
+		vector<sf::Text*> line_slice = fp::slice(line, begin, end);
+		slice.push_back(line_slice);
+	}
+
+	return slice;
+}
+void MainMenu::dump(const string& path)
+{
+	vector<vector<sf::Text*>> tab_vec = convert_tabs_to_drawable_text();
 	
+	int rounds = should_slice(tab_vec[0].size()) ? get_slice_number(tab_vec[0].size()) : 1;
+	int start = 0;
+	int end = tab_vec[0].size() < 22 ? tab_vec[0].size() : 22;
+	int round_counter = 0;
+	for (int i = 0; i < rounds; ++i)
+	{
+		string _path = path;
+		string name = _path.insert(path.find('/')+1, to_string(round_counter));
+
+		auto slice = slice_tab(tab_vec, start, end);
+		if (i > 0)slice = move_slice_left(slice);
+		render_tabs(slice, name);
+		round_counter++;
+
+		start = end + 1;	
+		const int& MDTCN = MAX_DRAWABABLE_TAB_CELL_NUMBER;
+		end = start + MDTCN > tab_vec[0].size() ? tab_vec[0].size() : start + MDTCN;
+	}
+}
+bool MainMenu::should_slice(size_t tab_line_size)
+{
+	return (tab_line_size / MAX_DRAWABABLE_TAB_CELL_NUMBER) >= 2;
+}
+size_t MainMenu::get_slice_number(size_t tab_line_size)
+{
+	int additional = tab_line_size % 2 == 0 ? 0 : 1;
+	int slice_number = tab_line_size / MAX_DRAWABABLE_TAB_CELL_NUMBER;
+	return slice_number + additional;
+}
+void MainMenu::render_tabs(vector<vector<sf::Text*>>& tabs,
+						   const string& path)
+{
+	sf::RenderWindow window(sf::VideoMode(720, 320), "test");
+
 	int counter = 0;
 	while (window.isOpen())
 	{
@@ -331,19 +393,15 @@ void MainMenu::dump(const string& path)
 			if (event.type == sf::Event::Closed)
 				window.close();
 		}
-	
-		sf::Texture texture;
-		texture.create(window.getSize().x, window.getSize().y);
-		texture.update(window);
-		sf::Image screenshot = texture.copyToImage();
-		screenshot.saveToFile(path);//)//window.close();
+
+		take_screenshot(window, path);
 		if (counter > 5) window.close();
 
 
 		window.clear();
-		for (auto tabs : tab_vec)
+		for (auto tabs : tabs)
 		{
-			for (auto t:tabs)
+			for (auto t : tabs)
 			{
 				window.draw(*t);
 			}
@@ -351,4 +409,25 @@ void MainMenu::dump(const string& path)
 		window.display();
 		++counter;
 	}
+}
+vector<vector<sf::Text*>> MainMenu::move_slice_left(vector<vector<sf::Text*>>& tabs)
+{
+	vector<vector<sf::Text*>> lines;
+	sf::Vector2f pos(0.0f, 0.0f);
+
+	vector<sf::Text*> line;
+	for (auto& line : tabs)
+	{
+		for (auto* cell : line)
+		{
+			sf::Text* new_cell = new sf::Text(*cell);
+			new_cell->setPosition(pos);
+			line.push_back(new_cell);
+			pos.x += 30.0f;
+		}
+		lines.push_back(line);
+		pos.x = 0.0f;
+		pos.y += 30.0f;
+	}
+	return lines;
 }

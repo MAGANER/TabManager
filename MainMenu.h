@@ -1,5 +1,6 @@
 #pragma once
 #include"SFML/Graphics.hpp"
+#include"Functools.hpp"
 #include<vector>
 #include<map>
 #include<iostream>
@@ -14,7 +15,7 @@
 namespace TabManager
 {
 using namespace std;
-
+namespace fp = Functools;
 struct Coord
 {
 	int x, y;
@@ -61,6 +62,9 @@ private:
 	const Coord DOWN { 0,1   };
 
 	bool key_pressed = false;
+
+	sf::Font font;
+	const int MAX_DRAWABABLE_TAB_CELL_NUMBER = 22;
 public:
 	MainMenu();
 	~MainMenu();
@@ -93,6 +97,15 @@ private:
 
 	void dump_to_png();
 	void dump(const string& path);
+	vector<vector<sf::Text*>> convert_tabs_to_drawable_text();
+	void take_screenshot(sf::RenderWindow& window,
+						 const string& path);
+	void render_tabs(vector<vector<sf::Text*>>& tabs,
+					 const string& path);
+	inline bool should_slice(size_t tab_line_size);
+	inline size_t get_slice_number(size_t tab_line_size);
+	vector<vector<sf::Text*>> slice_tab(vector<vector<sf::Text*>>& tabs, int begin, int end);
+	vector<vector<sf::Text*>> move_slice_left(vector<vector<sf::Text*>>& tabs);
 };
 };
 
