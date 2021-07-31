@@ -95,6 +95,8 @@ private:
 	vector<string> split_tab_line(const string& tab);
 	void align_loaded_field();
 
+	vector<int> get_cell_sizes();
+
 	void dump_to_png();
 	void dump(const string& path);
 	vector<vector<sf::Text*>> convert_tabs_to_drawable_text();

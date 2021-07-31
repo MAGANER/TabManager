@@ -126,7 +126,22 @@ void MainMenu::add_new_value()
 }
 void MainMenu::align_field(size_t val_size)
 {
-	int string_to_be_unchanged = current_pos.y;
+	auto cell_sizes = get_cell_sizes();
+	auto s_ptr = max_element(cell_sizes.begin(),cell_sizes.end());
+	auto max_size =  s_ptr != cell_sizes.end()? *s_ptr:-1;
+	for (int i = 0; i < string_number; i++)
+	{
+		auto curr_str = string_names[i];
+		auto cell_size = tab_field[curr_str][current_pos.x].size();
+		if (cell_size < max_size && max_size != -1)
+		{
+			size_t alignment_size = max_size - cell_size;
+			string alignment(alignment_size, ' ');
+
+			tab_field[curr_str][current_pos.x] += alignment;
+		}
+	}
+	/*int string_to_be_unchanged = current_pos.y;
 	for (int i = 0; i < string_number; i++)
 	{
 		if (i != string_to_be_unchanged)
@@ -134,16 +149,29 @@ void MainMenu::align_field(size_t val_size)
 			auto curr_str  = string_names[i];
 			auto cell_size = tab_field[curr_str][current_pos.x].size();
 
-			if (val_size != cell_size)
+			if (cell_size < val_size)
 			{
-				string alignment;
-				size_t alignment_size = val_size - cell_size;
-				for (int i = 0; i < alignment_size; i++)alignment += ' ';
+				size_t alignment_size = val_size - cell_size;		
+				string alignment(alignment_size,' ');
 
 				tab_field[curr_str][current_pos.x] += alignment;
 			}
 		}
+
+	}*/
+}
+vector<int> MainMenu::get_cell_sizes()
+{
+	int x = current_pos.x;
+
+	vector<int> sizes;
+	for (int y = 0; y < 6; ++y)
+	{
+		auto curr_str = string_names[y];
+		auto cell_size = tab_field[curr_str][x].size();
+		sizes.push_back(cell_size);
 	}
+	return sizes;
 }
 void MainMenu::insert_to_field(const string& val)
 {
